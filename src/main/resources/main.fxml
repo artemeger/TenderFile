@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="604.0" style="-fx-background-color: #2D3447;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.MainController">
+   <children>
+      <StackPane alignment="CENTER">
+         <children>
+            <Group layoutX="175.0" layoutY="146.0">
+               <children>
+                  <JFXButton fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" layoutX="57.0" layoutY="110.0" mnemonicParsing="false" onAction="#Login" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #4d4d4d;" text="Login" textFill="WHITE">
+                     <font>
+                        <Font name="Cambria Math" size="18.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXPasswordField focusColor="WHITE" layoutY="53.0" prefHeight="39.0" prefWidth="254.0" promptText="Private Key" unFocusColor="WHITE">
+                     <font>
+                        <Font name="Cambria Math" size="18.0" />
+                     </font></JFXPasswordField>
+               </children>
+            </Group>
+         </children>
+      </StackPane>
+   </children>
+</HBox>
