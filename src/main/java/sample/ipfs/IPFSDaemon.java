@@ -291,7 +291,7 @@ public class IPFSDaemon {
             case WINDOWS:{
                 bin = getBin();
                 cmd = ArrayUtils.insert(0, args, bin.getPath());
-                result = Runtime.getRuntime().exec(cmd, new String[] {"IPFS_PATH="+path.getAbsolutePath()});
+                result = Runtime.getRuntime().exec(cmd, new String[] {"IPFS_PATH=.ipfs"});
                 break;
             }
             case MAC: case LINUX: case FREEBSD:{

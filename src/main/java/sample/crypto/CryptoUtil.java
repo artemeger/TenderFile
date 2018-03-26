@@ -28,7 +28,13 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
+import java.io.IOException;
 import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 public abstract class CryptoUtil {
 
@@ -46,8 +52,8 @@ public abstract class CryptoUtil {
 
     public static KeyPair generateAsymKeypair() throws Exception{
         KeyPairGenerator rsaKeyGen = KeyPairGenerator.getInstance(ALGORITHM_NAME);
-        rsaKeyGen.initialize(RSA_KEY_LENGTH) ;
-        return rsaKeyGen.generateKeyPair() ;
+        rsaKeyGen.initialize(RSA_KEY_LENGTH);
+        return rsaKeyGen.generateKeyPair();
     }
 
     public static byte[] generateSymKey() throws Exception{
@@ -104,6 +110,55 @@ public abstract class CryptoUtil {
         } catch (NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }
+    }
+
+    public static void saveAsymKeypair(KeyPair keys){
+        RSAPrivateKey priv = (RSAPrivateKey) keys.getPrivate();
+        RSAPublicKey pub = (RSAPublicKey) keys.getPublic();
+        PEMFile privFile = new PEMFile(priv, "RSA PRIVATE KEY");
+        PEMFile pubFile = new PEMFile(pub, "RSA PUBLIC KEY");
+        try {
+            privFile.write("id_rsa");
+            pubFile.write("id.rsa.pub");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public static KeyPair loadAsymKeypair() {
+
+        KeyFactory factory = null;
+        try {
+            factory = KeyFactory.getInstance("RSA", "BC");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+
+        KeyPair keys = null;
+        try {
+            keys = new KeyPair(generatePublicKey(factory, "id.rsa.pub"), generatePrivateKey(factory, "id.rsa"));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return keys;
+
+    }
+    private static PrivateKey generatePrivateKey(KeyFactory factory, String filename) throws InvalidKeySpecException, IOException {
+        PEMFile pemFile = new PEMFile(filename);
+        byte[] content = pemFile.getPemObject().getContent();
+        PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(content);
+        return factory.generatePrivate(privKeySpec);
+    }
+
+    private static PublicKey generatePublicKey(KeyFactory factory, String filename) throws InvalidKeySpecException, IOException {
+        PEMFile pemFile = new PEMFile(filename);
+        byte[] content = pemFile.getPemObject().getContent();
+        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(content);
+        return factory.generatePublic(pubKeySpec);
     }
 
 

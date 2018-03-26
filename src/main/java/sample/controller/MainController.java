@@ -30,13 +30,16 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.acbi.Communication;
 import sample.classes.IPFSFile;
 import sample.crypto.CryptoUtil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.util.Scanner;
 
 
 public class MainController {
@@ -49,6 +52,14 @@ public class MainController {
     public void Login(ActionEvent event){
 
         Parent window = null;
+        Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Get Text");
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File phil = fc.showOpenDialog(null);
 
         try {
             window = FXMLLoader.load(getClass().getResource("/sample.fxml"));
@@ -56,9 +67,8 @@ public class MainController {
             e.printStackTrace();
         }
 
-        Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        primaryStage.setScene(new Scene(window));
-        primaryStage.setMaximized(true);
+        //primaryStage.setScene(new Scene(window));
+        //primaryStage.setMaximized(true);
 
     }
 
