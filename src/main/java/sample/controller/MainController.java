@@ -43,6 +43,7 @@ public class MainController {
 
     @FXML
     private Button loginButton;
+    static Communication com;
 
     @FXML
     public void Login(ActionEvent event){
@@ -55,30 +56,10 @@ public class MainController {
             e.printStackTrace();
         }
 
-        Communication com = new Communication();
-        while(!com.connected()) sleep(2000);
-
-        byte[] key = null;
-
-        try {
-            key = CryptoUtil.generateSymKey();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        IPFSFile f = new IPFSFile("Testfile","0x0000","0x0001", "txt", "QIUIUOdhodiIHJDFWJKOIWAHAKLJSO", key);
-        com.shareFile(f);
-
         Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
         primaryStage.setScene(new Scene(window));
         primaryStage.setMaximized(true);
 
-    }
-
-    private void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {}
     }
 
 }

@@ -23,27 +23,39 @@
  */
 package sample;
 
+import io.ipfs.api.IPFS;
+import io.ipfs.api.MerkleNode;
+import io.ipfs.api.NamedStreamable;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import sample.acbi.Communication;
+import sample.ipfs.IPFSDaemon;
+import static java.lang.Thread.sleep;
 
 public class Main extends Application {
+
+    private static IPFS ipfs;
+    private static Communication com;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        /*/
-        Daemon daemon = new Daemon();
+
+        IPFSDaemon daemon = new IPFSDaemon();
         daemon.binaries(); // Download, extract, load binaries
         daemon.start(); // Init and start the daemon
         daemon.attach(); // Attach the API
-        IPFS ipfs = daemon.getIPFS(); // Get the API object
-        NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(new File("Path to File"));
-        MerkleNode addResult = ipfs.add(file).get(0);
-        System.out.println(addResult.hash.toString());
-        /*/
+        ipfs = daemon.getIPFS(); // Get the API object
+        //Open Websocket
+        //com = new Communication();
+        //while(!com.connected()) sleep(2000);
+
+        //NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(new File("Path to File"));
+        //MerkleNode addResult = ipfs.add(file).get(0);
+        //System.out.println(addResult.hash.toString());
 
         Parent root = FXMLLoader.load(getClass().getResource("/main.fxml"));
         primaryStage.setTitle("Application");
