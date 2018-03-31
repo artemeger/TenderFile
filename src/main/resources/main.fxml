@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXPasswordField?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -13,15 +12,16 @@
          <children>
             <Group layoutX="175.0" layoutY="146.0">
                <children>
-                  <JFXButton fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" layoutX="57.0" layoutY="110.0" mnemonicParsing="false" onAction="#Login" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #4d4d4d;" text="Login" textFill="WHITE">
+                  <JFXButton fx:id="loginButton" alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="123.0" mnemonicParsing="false" onAction="#Login" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #4d4d4d;" text="Login" textFill="WHITE">
                      <font>
                         <Font name="Cambria Math" size="18.0" />
                      </font>
                   </JFXButton>
-                  <JFXPasswordField focusColor="WHITE" layoutY="53.0" prefHeight="39.0" prefWidth="254.0" promptText="Private Key" unFocusColor="WHITE">
+                  <JFXButton fx:id="generateButton" alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="14.0" mnemonicParsing="false" onAction="#Generate" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #4d4d4d;" text="Generate" textFill="WHITE">
                      <font>
                         <Font name="Cambria Math" size="18.0" />
-                     </font></JFXPasswordField>
+                     </font>
+                  </JFXButton>
                </children>
             </Group>
          </children>

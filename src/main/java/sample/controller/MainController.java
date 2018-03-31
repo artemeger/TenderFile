@@ -29,46 +29,68 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.acbi.Communication;
-import sample.classes.IPFSFile;
 import sample.crypto.CryptoUtil;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 
 public class MainController {
 
-    @FXML
-    private Button loginButton;
     static Communication com;
+    private static PublicKey pub;
+    private static PrivateKey priv;
 
     @FXML
     public void Login(ActionEvent event){
 
-        Parent window = null;
-        Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
+        Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Parent window = null;
+
+        /*/
         FileChooser fc = new FileChooser();
         fc.setTitle("Get Text");
         fc.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
         File phil = fc.showOpenDialog(null);
+        /*/
+
+        KeyPair keys = CryptoUtil.loadAsymKeypair();
+        pub = keys.getPublic();
+        priv = keys.getPrivate();
 
         try {
-            window = FXMLLoader.load(getClass().getResource("/sample.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/sample.fxml"));
+            window = loader.load();
+            SampleController con = loader.getController();
+            con.showKey(priv, pub);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //primaryStage.setScene(new Scene(window));
-        //primaryStage.setMaximized(true);
+        primaryStage.setScene(new Scene(window));
+        primaryStage.setMaximized(true);
+
+    }
+
+    @FXML
+    public void Generate(){
+
+        KeyPair keys = null;
+
+        try {
+            keys = CryptoUtil.generateAsymKeypair();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(keys != null)
+            CryptoUtil.saveAsymKeypair(keys);
 
     }
 

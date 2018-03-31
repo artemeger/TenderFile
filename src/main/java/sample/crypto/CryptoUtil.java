@@ -23,6 +23,7 @@
  */
 package sample.crypto;
 
+import com.github.jtendermint.crypto.ByteUtil;
 import org.apache.commons.lang3.SerializationUtils;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -37,6 +38,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public abstract class CryptoUtil {
+
 
     //ASYM
     private static int RSA_KEY_LENGTH = 4096;
@@ -103,12 +105,14 @@ public abstract class CryptoUtil {
         return c.doFinal(data);
     }
 
-    public static byte[] ripemd160(byte[] bytesToHash) throws CryptoException {
+    public static String sha256hash(byte[] bytesToHash){
         try {
-            MessageDigest md = MessageDigest.getInstance("RIPEMD160");
-            return md.digest(bytesToHash);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            return ByteUtil.toString00(md.digest(bytesToHash));
+
         } catch (NoSuchAlgorithmException e) {
-            throw new CryptoException(e);
+            e.printStackTrace();
+            return "0x000";
         }
     }
 
@@ -118,8 +122,8 @@ public abstract class CryptoUtil {
         PEMFile privFile = new PEMFile(priv, "RSA PRIVATE KEY");
         PEMFile pubFile = new PEMFile(pub, "RSA PUBLIC KEY");
         try {
-            privFile.write("id_rsa");
-            pubFile.write("id.rsa.pub");
+            privFile.write("src/main/resources/keys/id_rsa");
+            pubFile.write("src/main/resources/keys/id.rsa.pub");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,16 +133,14 @@ public abstract class CryptoUtil {
 
         KeyFactory factory = null;
         try {
-            factory = KeyFactory.getInstance("RSA", "BC");
+            factory = KeyFactory.getInstance("RSA");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
 
         KeyPair keys = null;
         try {
-            keys = new KeyPair(generatePublicKey(factory, "id.rsa.pub"), generatePrivateKey(factory, "id.rsa"));
+            keys = new KeyPair(generatePublicKey(factory, "src/main/resources/keys/id.rsa.pub"), generatePrivateKey(factory, "src/main/resources/keys/id_rsa"));
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (IOException e) {

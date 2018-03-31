@@ -23,6 +23,32 @@
  */
 package sample.controller;
 
-public class SampleController {
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import sample.crypto.CryptoUtil;
 
+import java.net.URL;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.ResourceBundle;
+
+public class SampleController implements Initializable{
+
+    @FXML
+    private Label privKey;
+    @FXML
+    private Label pubKey;
+
+
+    @Override
+    @FXML
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    }
+
+    public void showKey(PrivateKey priv, PublicKey pub){
+        privKey.setText(priv.toString());
+        pubKey.setText(CryptoUtil.sha256hash(pub.getEncoded()));
+    }
 }
