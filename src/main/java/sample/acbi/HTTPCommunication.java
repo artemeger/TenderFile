@@ -1,7 +1,9 @@
 package sample.acbi;
 
+import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+import sample.classes.IPFSFile;
 import sample.crypto.CryptoUtil;
 import java.io.IOException;
 import java.net.URL;
@@ -20,7 +22,6 @@ public abstract class HTTPCommunication {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         if(json != null)
             return json.getJSONObject("result").get("tx").toString();
         else
@@ -32,15 +33,31 @@ public abstract class HTTPCommunication {
         JSONObject json = null;
 
         String test = SERVER+"broadcast_tx_commit?tx="+"\""+CryptoUtil.publicKeyToString(pubKey)+"\"";
-        System.out.println(test);
         try {
             json = new JSONObject(IOUtils.toString(new URL(test), Charset.forName("UTF-8")));
         } catch (IOException e) {
             e.printStackTrace();
         }
         if(json != null){
+            System.out.println(json.getJSONObject("result").get("hash").toString());
             return json.getJSONObject("result").get("hash").toString();}
         else
             return null;
     }
+
+    public static String shareIpfsFile(IPFSFile file){
+
+        JSONObject json = null;
+        String test = SERVER+"broadcast_tx_commit?tx="+"\""+CryptoUtil.stringFromIpfsFile(file)+"\"";
+        try {
+            json = new JSONObject(IOUtils.toString(new URL(test), Charset.forName("UTF-8")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(json != null)
+            return json.getJSONObject("result").get("hash").toString();
+        else
+            return null;
+    }
+
 }

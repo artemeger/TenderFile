@@ -1,26 +1,28 @@
 package sample.database;
 
+import sample.classes.IPFSFile;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-public abstract class Contact {
+public abstract class SharedFile{
 
-    private static final String FILEPATH = "contacts.ser";
+    private static final String FILEPATH = "shared.ser";
 
-    public static void saveContact(String name, String value){
+    public static void saveIPFSFile(String name, IPFSFile file){
 
         Path path = Paths.get(FILEPATH);
-        HashMap<String, String> hmap;
+        HashMap<String, IPFSFile> hmap;
 
         if (Files.exists(path))
-            hmap = getContacts();
+            hmap = getAllIPFSFiles();
         else
             hmap = new HashMap<>();
 
-        hmap.put(name, value);
+        hmap.put(name, file);
 
         try {
             FileOutputStream fos = new FileOutputStream(FILEPATH);
@@ -34,14 +36,14 @@ public abstract class Contact {
     }
 
 
-    public static HashMap<String, String> getContacts(){
+    public static HashMap<String, IPFSFile> getAllIPFSFiles(){
 
-        HashMap<String, String> hmap = null;
+        HashMap<String, IPFSFile> hmap = null;
         try
         {
             FileInputStream fis = new FileInputStream(FILEPATH);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            hmap = (HashMap<String,String>) ois.readObject();
+            hmap = (HashMap<String,IPFSFile>) ois.readObject();
             ois.close();
             fis.close();
         }catch(IOException e){
@@ -54,9 +56,8 @@ public abstract class Contact {
         return hmap;
     }
 
-    public static String getContactValue(String name){
-        HashMap<String, String> hmap = getContacts();
+    public static IPFSFile getIPFSFile(String name){
+        HashMap<String, IPFSFile> hmap = getAllIPFSFiles();
         return hmap.get(name);
     }
-
 }

@@ -23,23 +23,59 @@
  */
 package sample.controller;
 
+import com.jfoenix.controls.JFXTextField;
+import io.ipfs.api.IPFS;
+import io.ipfs.api.MerkleNode;
+import io.ipfs.api.NamedStreamable;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import sample.Main;
+import sample.acbi.HTTPCommunication;
+import sample.classes.IPFSFile;
 import sample.crypto.CryptoUtil;
 import sample.database.Contact;
+import sample.database.SharedFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ResourceBundle;
+import java.security.interfaces.RSAPublicKey;
+import java.util.*;
 
 public class SampleController implements Initializable{
 
     @FXML
-    private Label privKey;
+    private JFXTextField myId;
     @FXML
-    private Label pubKey;
+    private TextField txHash;
+    @FXML
+    private TextField contactHash;
+    @FXML
+    private ListView filesView;
+    @FXML
+    private Label desc;
+    @FXML
+    private JFXTextField latestHash;
+
+    private PublicKey pubKey;
+    private PrivateKey privKey;
+    private IPFS deamon;
+    private String helper = "";
+
+
 
     @Override
     @FXML
@@ -48,7 +84,65 @@ public class SampleController implements Initializable{
     }
 
     public void showKey(PrivateKey priv, PublicKey pub){
-        privKey.setText(Contact.getContactValue("me"));
-        pubKey.setText(CryptoUtil.sha256hash(pub.getEncoded()));
+        myId.setText(Contact.getContactValue("me"));
+        this.pubKey = pub;
+        this.privKey = priv;
+        this.deamon = Main.getDeamon();
+    }
+
+    @FXML
+    public void shareFile(ActionEvent event){
+        Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(primaryStage);
+        PublicKey recPubKey = CryptoUtil.publicKeyFromString(HTTPCommunication.getPubKeyByHash(contactHash.getText()));
+        byte [] symKey;
+        byte [] encFile;
+        byte [] encSymKey = null;
+        try {
+            symKey = CryptoUtil.generateSymKey();
+            encFile = CryptoUtil.encryptSym(symKey, Files.readAllBytes(file.toPath()));
+            FileUtils.writeByteArrayToFile(new File("enc"), encFile);
+            encSymKey = CryptoUtil.encryptAsym(recPubKey, symKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        NamedStreamable.FileWrapper fileipfs = new NamedStreamable.FileWrapper(new File("enc"));
+        MerkleNode addResult = null;
+        try {
+            addResult = this.deamon.add(fileipfs).get(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String ipfsHash = addResult.hash.toString();
+
+        if((file != null) &  (Contact.getContactValue("me") != null) & (txHash.getText()!= null) & (ipfsHash != null) &(encSymKey != null)) {
+            IPFSFile newFile = new IPFSFile(file.getName(), Contact.getContactValue("me"), txHash.getText(), FilenameUtils.getExtension(file.getAbsolutePath()), ipfsHash, encSymKey);
+            String resHash = HTTPCommunication.shareIpfsFile(newFile);
+            desc.setText("Last Shared File Hash");
+            latestHash.setText(resHash);
+        }
+    }
+
+    @FXML
+    public void getFile(){
+        String fileString = HTTPCommunication.getPubKeyByHash(contactHash.getText());
+        IPFSFile file = CryptoUtil.ipfsFileFromString(fileString);
+        SharedFile.saveIPFSFile(file.getName(), file);
+        populateFileView();
+    }
+
+    @FXML
+    public void populateFileView(){
+        HashMap<String, IPFSFile> hmap = SharedFile.getAllIPFSFiles();
+        if(hmap != null) {
+            Collection<String> set = (Collection<String>) (Collection<?>) hmap.keySet();
+            filesView.getItems().addAll(set);
+        }
+    }
+
+    @FXML void openFile(){
+
     }
 }

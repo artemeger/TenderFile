@@ -43,4 +43,28 @@ public class IPFSFile {
         this.time = System.currentTimeMillis();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getReciever() {
+        return reciever;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getIpfshash() {
+        return ipfshash;
+    }
+
+    public byte[] getSecretKey() {
+        return secretKey;
+    }
+
 }

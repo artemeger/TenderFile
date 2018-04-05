@@ -23,6 +23,7 @@
  */
 package sample;
 
+import com.google.common.io.BaseEncoding;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
@@ -38,7 +39,6 @@ import sample.ipfs.IPFSDaemon;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
 import static java.lang.Thread.sleep;
 
 public class Main extends Application {
@@ -49,22 +49,22 @@ public class Main extends Application {
     private static PrivateKey priv;
 
     public static Communication getComunnication(){return com;}
+    public static IPFS getDeamon(){return ipfs;}
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
 
-        //IPFSDaemon daemon = new IPFSDaemon();
-        //daemon.binaries(); // Download, extract, load binaries
-        //daemon.start(); // Init and start the daemon
-        //daemon.attach(); // Attach the API
-        //ipfs = daemon.getIPFS(); // Get the API object
+        IPFSDaemon daemon = new IPFSDaemon();
+        daemon.binaries(); // Download, extract, load binaries
+        daemon.start(); // Init and start the daemon
+        daemon.attach(); // Attach the API
+        ipfs = daemon.getIPFS(); // Get the API object
 
         //Open Websocket
         //com = new Communication();
         //while(!com.connected()) sleep(2000);
-
 
         //NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(new File("Path to File"));
         //MerkleNode addResult = ipfs.add(file).get(0);
