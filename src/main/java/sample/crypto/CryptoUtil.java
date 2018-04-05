@@ -36,6 +36,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 public abstract class CryptoUtil {
 
@@ -122,8 +123,8 @@ public abstract class CryptoUtil {
         PEMFile privFile = new PEMFile(priv, "RSA PRIVATE KEY");
         PEMFile pubFile = new PEMFile(pub, "RSA PUBLIC KEY");
         try {
-            privFile.write("src/main/resources/keys/id_rsa");
-            pubFile.write("src/main/resources/keys/id.rsa.pub");
+            privFile.write(".id_rsa");
+            pubFile.write(".id.rsa.pub");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,7 +141,7 @@ public abstract class CryptoUtil {
 
         KeyPair keys = null;
         try {
-            keys = new KeyPair(generatePublicKey(factory, "src/main/resources/keys/id.rsa.pub"), generatePrivateKey(factory, "src/main/resources/keys/id_rsa"));
+            keys = new KeyPair(generatePublicKey(factory, ".id.rsa.pub"), generatePrivateKey(factory, ".id_rsa"));
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -163,5 +164,30 @@ public abstract class CryptoUtil {
         return factory.generatePublic(pubKeySpec);
     }
 
+    public static String publicKeyToString(PublicKey pub){
+        return Base64.getEncoder().encodeToString(pub.getEncoded());
+    }
+
+    public static PublicKey publicKeyFromString(String key){
+
+        X509EncodedKeySpec spec = null;
+
+        spec = new X509EncodedKeySpec(Base64.getDecoder().decode(key));
+
+        KeyFactory kf = null;
+        try {
+            kf = KeyFactory.getInstance(ALGORITHM_NAME);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        PublicKey pubKey = null;
+        try {
+            pubKey = kf.generatePublic(spec);
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+
+        return pubKey;
+    }
 
 }

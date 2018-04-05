@@ -26,15 +26,20 @@ package sample.acbi;
 import com.github.jtendermint.websocket.Websocket;
 import com.github.jtendermint.websocket.WebsocketException;
 import com.github.jtendermint.websocket.WebsocketStatus;
-import com.github.jtendermint.websocket.jsonrpc.JSONRPC;
-import com.github.jtendermint.websocket.jsonrpc.Method;
+import com.github.jtendermint.websocket.jsonrpc.*;
+import com.github.jtendermint.websocket.jsonrpc.calls.MixedParam;
 import com.github.jtendermint.websocket.jsonrpc.calls.StringParam;
 import com.google.gson.Gson;
 import sample.classes.IPFSFile;
+import sample.crypto.CryptoUtil;
 import sample.interfaces.IShareFile;
+
+import java.security.PublicKey;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class Communication implements WebsocketStatus, IShareFile{
 
@@ -61,7 +66,7 @@ public class Communication implements WebsocketStatus, IShareFile{
 
     @Override
     public void shareFile(IPFSFile file) {
-        JSONRPC rpc = new StringParam(Method.BROADCAST_TX_COMMIT, gson.toJson(file).getBytes());
+        JSONRPC rpc = new StringParam(Method.BROADCAST_TX_COMMIT ,gson.toJson(file).getBytes());
         webSocket.sendMessage(rpc, result -> {
 
                 if (result.hasResult()) {
@@ -75,5 +80,19 @@ public class Communication implements WebsocketStatus, IShareFile{
 
     public boolean connected(){
         return webSocket.isOpen();
+    }
+
+    public void registerUser(PublicKey pub){
+
+        JSONRPC rpc = new StringParam(Method.BROADCAST_TX_COMMIT, CryptoUtil.publicKeyToString(pub));
+        webSocket.sendMessage(rpc, result ->{
+
+            if (result.hasResult()) {
+                System.out.println(result.getResult().toString());
+            } else if (result.hasError()) {
+                System.out.println(result.getError().toString());
+            }
+        });
+
     }
 }

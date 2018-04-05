@@ -27,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import sample.crypto.CryptoUtil;
+import sample.database.Contact;
 
 import java.net.URL;
 import java.security.PrivateKey;
@@ -40,7 +41,6 @@ public class SampleController implements Initializable{
     @FXML
     private Label pubKey;
 
-
     @Override
     @FXML
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,7 +48,7 @@ public class SampleController implements Initializable{
     }
 
     public void showKey(PrivateKey priv, PublicKey pub){
-        privKey.setText(priv.toString());
+        privKey.setText(Contact.getContactValue("me"));
         pubKey.setText(CryptoUtil.sha256hash(pub.getEncoded()));
     }
 }

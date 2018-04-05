@@ -4,13 +4,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.SampleController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.SampleController">
    <children>
-      <HBox prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <Label fx:id="privKey" layoutY="50" text="Label" />
-            <Label fx:id="pubKey" text="Label" />
-         </children>
-      </HBox>
+      <HBox prefHeight="100.0" prefWidth="200.0" />
+      <Label fx:id="privKey" layoutX="16.0" layoutY="187.0" prefHeight="17.0" prefWidth="567.0" text="Label" />
+      <Label fx:id="pubKey" layoutX="14.0" layoutY="131.0" prefHeight="17.0" prefWidth="573.0" text="Label" />
    </children>
 </AnchorPane>

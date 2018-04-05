@@ -29,10 +29,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import sample.acbi.Communication;
+import sample.acbi.HTTPCommunication;
 import sample.crypto.CryptoUtil;
+import sample.database.Contact;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -41,25 +42,14 @@ import java.security.PublicKey;
 
 public class MainController {
 
-    static Communication com;
     private static PublicKey pub;
     private static PrivateKey priv;
 
     @FXML
     public void Login(ActionEvent event){
 
-
         Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
         Parent window = null;
-
-        /*/
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Get Text");
-        fc.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
-        File phil = fc.showOpenDialog(null);
-        /*/
 
         KeyPair keys = CryptoUtil.loadAsymKeypair();
         pub = keys.getPublic();
@@ -89,9 +79,11 @@ public class MainController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(keys != null)
+        if(keys != null) {
             CryptoUtil.saveAsymKeypair(keys);
-
+            String hash = HTTPCommunication.registerUser(keys.getPublic());
+            Contact.saveContact("me", hash);
+        }
     }
 
 }
