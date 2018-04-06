@@ -23,7 +23,9 @@
  */
 package sample.classes;
 
-public class IPFSFile {
+import java.io.Serializable;
+
+public class IPFSFile implements Serializable{
 
     private final String name;
     private final String sender;

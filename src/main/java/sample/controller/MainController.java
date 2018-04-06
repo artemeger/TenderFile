@@ -82,7 +82,6 @@ public class MainController {
             CryptoUtil.saveAsymKeypair(keys);
             String hash = HTTPCommunication.registerUser(keys.getPublic());
             Contact.saveContact("me", hash);
-            System.out.println(hash);
         }
     }
 

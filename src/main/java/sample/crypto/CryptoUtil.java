@@ -64,7 +64,7 @@ public abstract class CryptoUtil {
     private static int AES_KEY_SIZE = 128;
     private static int IV_SIZE = 96;
     private static int TAG_BIT_LENGTH = 128;
-    private static String ALGO_TRANSFORMATION_STRING = "AES/GCM/PKCS5Padding";
+    private static String ALGO_TRANSFORMATION_STRING = "AES/GCM/NoPadding";
 
     public static KeyPair generateAsymKeypair() throws Exception{
         KeyPairGenerator rsaKeyGen = KeyPairGenerator.getInstance(ALGORITHM_NAME);
@@ -80,7 +80,7 @@ public abstract class CryptoUtil {
 
         byte random[] = new byte[16];
         secRandom = new SecureRandom();
-        secRandom.nextBytes(iv);
+        secRandom.nextBytes(random);
 
         KeyGenerator keygen = KeyGenerator.getInstance("AES");
         keygen.init(AES_KEY_SIZE);
@@ -105,25 +105,26 @@ public abstract class CryptoUtil {
         FullSymKey key = SerializationUtils.deserialize(byteKey);
         Cipher c = Cipher.getInstance(ALGO_TRANSFORMATION_STRING);
         GCMParameterSpec gcm = new GCMParameterSpec(TAG_BIT_LENGTH, key.getIv());
-        c.init(Cipher.ENCRYPT_MODE, key.getKey(), gcm , new SecureRandom()) ;
+        c.init(Cipher.ENCRYPT_MODE, key.getKey(), gcm);
         c.updateAAD(key.getRandom());
-        return c.doFinal(data);
+        byte [] result = c.doFinal(data);
+        return result;
     }
 
     public static byte[] decryptSym (byte [] byteKey, byte[] data) throws Exception{
         FullSymKey key = SerializationUtils.deserialize(byteKey);
         Cipher c = Cipher.getInstance(ALGO_TRANSFORMATION_STRING);
         GCMParameterSpec gcm = new GCMParameterSpec(TAG_BIT_LENGTH, key.getIv());
-        c.init(Cipher.DECRYPT_MODE, key.getKey(), gcm, new SecureRandom());
+        c.init(Cipher.DECRYPT_MODE, key.getKey(), gcm);
         c.updateAAD(key.getRandom());
-        return c.doFinal(data);
+        byte [] result = c.doFinal(data);
+        return result;
     }
 
     public static String sha256hash(byte[] bytesToHash){
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             return ByteUtil.toString00(md.digest(bytesToHash));
-
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return "0x000";

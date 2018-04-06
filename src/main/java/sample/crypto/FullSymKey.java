@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 package sample.crypto;
-
 import javax.crypto.SecretKey;
 import java.io.Serializable;
 

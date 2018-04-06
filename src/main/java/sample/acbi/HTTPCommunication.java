@@ -39,7 +39,6 @@ public abstract class HTTPCommunication {
             e.printStackTrace();
         }
         if(json != null){
-            System.out.println(json.getJSONObject("result").get("hash").toString());
             return json.getJSONObject("result").get("hash").toString();}
         else
             return null;

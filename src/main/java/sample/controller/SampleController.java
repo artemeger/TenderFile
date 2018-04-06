@@ -27,6 +27,7 @@ import com.jfoenix.controls.JFXTextField;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
+import io.ipfs.multihash.Multihash;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -38,21 +39,22 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import sample.Main;
 import sample.acbi.HTTPCommunication;
 import sample.classes.IPFSFile;
 import sample.crypto.CryptoUtil;
 import sample.database.Contact;
 import sample.database.SharedFile;
-
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
+
 import java.util.*;
 
 public class SampleController implements Initializable{
@@ -73,8 +75,6 @@ public class SampleController implements Initializable{
     private PublicKey pubKey;
     private PrivateKey privKey;
     private IPFS deamon;
-    private String helper = "";
-
 
 
     @Override
@@ -88,6 +88,10 @@ public class SampleController implements Initializable{
         this.pubKey = pub;
         this.privKey = priv;
         this.deamon = Main.getDeamon();
+
+        Path path = Paths.get("shared.ser");
+        if (Files.exists(path))
+            populateFileView();
     }
 
     @FXML
@@ -96,22 +100,22 @@ public class SampleController implements Initializable{
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(primaryStage);
         PublicKey recPubKey = CryptoUtil.publicKeyFromString(HTTPCommunication.getPubKeyByHash(contactHash.getText()));
-        byte [] symKey;
-        byte [] encFile;
+        byte [] symKey = null;
+        byte [] encFile = null;
         byte [] encSymKey = null;
         try {
             symKey = CryptoUtil.generateSymKey();
-            encFile = CryptoUtil.encryptSym(symKey, Files.readAllBytes(file.toPath()));
-            FileUtils.writeByteArrayToFile(new File("enc"), encFile);
+            byte [] filebytes = Files.readAllBytes(file.toPath());
+            encFile = CryptoUtil.encryptSym(symKey, filebytes);
             encSymKey = CryptoUtil.encryptAsym(recPubKey, symKey);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        NamedStreamable.FileWrapper fileipfs = new NamedStreamable.FileWrapper(new File("enc"));
+        NamedStreamable.ByteArrayWrapper wrapper = new NamedStreamable.ByteArrayWrapper(encFile);
         MerkleNode addResult = null;
         try {
-            addResult = this.deamon.add(fileipfs).get(0);
+            addResult = this.deamon.add(wrapper).get(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,18 +127,45 @@ public class SampleController implements Initializable{
             desc.setText("Last Shared File Hash");
             latestHash.setText(resHash);
         }
+
+        Path path = Paths.get("shared.ser");
+        if (Files.exists(path))
+            populateFileView();
     }
 
     @FXML
     public void getFile(){
-        String fileString = HTTPCommunication.getPubKeyByHash(contactHash.getText());
+        String fileString = HTTPCommunication.getPubKeyByHash(txHash.getText());
         IPFSFile file = CryptoUtil.ipfsFileFromString(fileString);
         SharedFile.saveIPFSFile(file.getName(), file);
-        populateFileView();
+
+        String hash = file.getIpfshash();
+        byte[] key = file.getSecretKey();
+        byte[] encKey = null;
+        try {
+            encKey = CryptoUtil.decryptAsym(privKey, key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Multihash filePointer = Multihash.fromBase58(hash);
+
+        try {
+            byte [] fileContent = deamon.cat(filePointer);
+            if(encKey != null && fileContent != null)
+                FileUtils.writeByteArrayToFile(new File("shared/"+file.getName()), CryptoUtil.decryptSym(encKey, fileContent));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Path path = Paths.get("shared.ser");
+        if (Files.exists(path))
+            populateFileView();
     }
 
     @FXML
     public void populateFileView(){
+        filesView.getItems().clear();
         HashMap<String, IPFSFile> hmap = SharedFile.getAllIPFSFiles();
         if(hmap != null) {
             Collection<String> set = (Collection<String>) (Collection<?>) hmap.keySet();
@@ -144,5 +175,20 @@ public class SampleController implements Initializable{
 
     @FXML void openFile(){
 
+        String filename = (String) filesView.getSelectionModel().getSelectedItem();
+
+        try {
+            Desktop desktop = null;
+            if (Desktop.isDesktopSupported()) {
+                desktop = Desktop.getDesktop();
+            }
+            desktop.open(new File("shared/"+filename));
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        Path path = Paths.get("shared.ser");
+        if (Files.exists(path))
+            populateFileView();
     }
 }
