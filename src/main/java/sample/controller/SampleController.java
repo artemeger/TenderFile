@@ -42,6 +42,7 @@ import org.apache.commons.io.FilenameUtils;
 import sample.Main;
 import sample.acbi.HTTPCommunication;
 import sample.classes.IPFSFile;
+import sample.classes.Transaction;
 import sample.crypto.CryptoUtil;
 import sample.database.Contact;
 import sample.database.SharedFile;
@@ -123,7 +124,8 @@ public class SampleController implements Initializable{
 
         if((file != null) &  (Contact.getContactValue("me") != null) & (txHash.getText()!= null) & (ipfsHash != null) &(encSymKey != null)) {
             IPFSFile newFile = new IPFSFile(file.getName(), Contact.getContactValue("me"), txHash.getText(), FilenameUtils.getExtension(file.getAbsolutePath()), ipfsHash, encSymKey);
-            String resHash = HTTPCommunication.shareIpfsFile(newFile);
+            Transaction trans = new Transaction("newowner", newFile);
+            String resHash = HTTPCommunication.shareIpfsFile(trans);
             desc.setText("Last Shared File Hash");
             latestHash.setText(resHash);
         }

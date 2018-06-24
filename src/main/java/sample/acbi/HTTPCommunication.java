@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import sample.classes.IPFSFile;
+import sample.classes.Transaction;
 import sample.crypto.CryptoUtil;
 import java.io.IOException;
 import java.net.URL;
@@ -12,7 +13,7 @@ import java.security.PublicKey;
 
 public abstract class HTTPCommunication {
 
-    private static String SERVER = "http://192.168.178.32:46657/";
+    private static String SERVER = "http://localhost:46657/";
 
     public static String getPubKeyByHash(String hash){
 
@@ -44,7 +45,7 @@ public abstract class HTTPCommunication {
             return null;
     }
 
-    public static String shareIpfsFile(IPFSFile file){
+    public static String shareIpfsFile(Transaction file){
 
         JSONObject json = null;
         String test = SERVER+"broadcast_tx_commit?tx="+"\""+CryptoUtil.stringFromIpfsFile(file)+"\"";

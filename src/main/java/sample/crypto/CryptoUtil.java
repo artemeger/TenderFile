@@ -47,6 +47,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import sample.classes.Transaction;
 
 public abstract class CryptoUtil {
 
@@ -185,7 +186,7 @@ public abstract class CryptoUtil {
         return Base64.getEncoder().encodeToString(gson.toJson(custom).getBytes());
     }
 
-    public static String stringFromIpfsFile(IPFSFile file){
+    public static String stringFromIpfsFile(Transaction file){
         Gson gson = new Gson();
         return Base64.getEncoder().encodeToString(gson.toJson(file).getBytes());
     }
@@ -194,7 +195,8 @@ public abstract class CryptoUtil {
         byte[] decoded = Base64.getDecoder().decode(fileString);
         byte[] base64Decoded = DatatypeConverter.parseBase64Binary(new String(decoded));
         Gson gson = new Gson();
-        return gson.fromJson(new String(base64Decoded) ,IPFSFile.class);
+        Transaction trans = gson.fromJson(new String(base64Decoded) ,Transaction.class);
+        return trans.getIpfsFile();
     }
 
     public static PublicKey publicKeyFromString(String key){
