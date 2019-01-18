@@ -1,4 +1,4 @@
 # TenderFile
-Filesharing with Tendermint &amp; IPFS
+Blockchain-based Access Right Management for Private Data in Decentralized Cloud Storage Systems
 
-Work in progress
+POC - Prototype and Paper
